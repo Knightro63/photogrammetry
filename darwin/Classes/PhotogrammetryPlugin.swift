@@ -90,8 +90,8 @@ public class PhotogrammetryPlugin: NSObject, FlutterPlugin, FlutterStreamHandler
         }
 
         let inputFolderUrl = URL(fileURLWithPath: path)//"/tmp/MyInputImages/"
-        let fileName = arguments["name"] as! String
-        let url = URL(fileURLWithPath: fileName+".usdz")
+        let fileName = path+"/"+(arguments["name"] as! String)+".usdz"
+        let url = URL(fileURLWithPath: fileName)
         
         var quality:PhotogrammetrySession.Request.Detail = PhotogrammetrySession.Request.Detail.full
         switch arguments["quality"] as! String{
@@ -173,7 +173,7 @@ public class PhotogrammetryPlugin: NSObject, FlutterPlugin, FlutterStreamHandler
                             break
                     case .requestComplete(_, _):
                             self.sink([
-                                "onProcessingCompleted": url.absoluteString
+                                "onProcessingCompleted": fileName
                             ])
                             // RealityKit has finished processing a request.
                             break

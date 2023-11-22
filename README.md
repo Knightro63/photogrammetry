@@ -141,7 +141,7 @@ You need to first import 'package:photogrammetry/photogrammetry.dart';
 
 ## Example
 
-Find the example for this API [here](https://github.com/Knightro63/photogrammetry/tree/main/packages/photogrammetry/example/lib/main.dart).
+Find the example for this API [here](https://github.com/Knightro63/photogrammetry/tree/main/example/lib/main.dart).
 
 ## Contributing
 
