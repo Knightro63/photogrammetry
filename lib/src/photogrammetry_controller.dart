@@ -96,9 +96,9 @@ class Photogrammetry {
 
   /// Abort making the model
   Future<String?> abort() async {
-    return _methodChannel.invokeMethod('abort').then((value){
-      events?.cancel();
-    });
+    String temp = await _methodChannel.invokeMethod('abort');
+    events?.cancel();
+    return temp;
   }
 
   /// Dispose of the stream event
