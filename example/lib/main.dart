@@ -58,8 +58,7 @@ class _MyHomePageState extends State<MyHomePage> {
           pg = Photogrammetry()..process(
             pgData: PhotogrammetryData(
               path: value,
-              name: 'TestHuman1',
-              quality: PhotogrammetryQuality.preview
+              name: 'Photogrammetry_Test',
             ),
             onDownsampling: (){
               print('onDownsampling');
@@ -136,7 +135,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   borderRadius: BorderRadius.circular(5)
                 ),
                 padding: const EdgeInsets.fromLTRB(10,0,10,0),
-                margin: EdgeInsets.only(top: 20),
+                margin: const EdgeInsets.only(top: 20),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -159,10 +158,10 @@ class _MyHomePageState extends State<MyHomePage> {
         onPressed: (){
           pg?.abort();
         },
-        tooltip: 'Increment',
+        tooltip: 'Abort',
         backgroundColor: Colors.purple[100],
         child: Icon(Icons.cancel, color: Colors.purple[900],),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      ),
     );
   }
 }
