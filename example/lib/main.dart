@@ -58,6 +58,7 @@ class _MyHomePageState extends State<MyHomePage> {
           pg = Photogrammetry()..process(
             pgData: PhotogrammetryData(
               path: value,
+              format: PhotogrammetryFormat.obj,
               name: 'Photogrammetry_Test',
             ),
             onDownsampling: (){

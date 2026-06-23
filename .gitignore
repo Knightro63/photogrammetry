@@ -11,15 +11,24 @@
 .svn/
 
 # IntelliJ related
+*.iml
 *.ipr
 *.iws
 .idea/
+.metadata
 
 # Visual Studio Code related
 .classpath
 .project
 .settings/
 .vscode/*
+
+*/macos
+*/web
+*/ios
+*/android
+*/linux
+*/windows
 
 # Flutter repo-specific
 /bin/cache/

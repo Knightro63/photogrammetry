@@ -85,53 +85,60 @@ public class PhotogrammetryPlugin: NSObject, FlutterPlugin, FlutterStreamHandler
                 result(FlutterError(code: "ERROR", message: "Photogrammetry not supported.", details: nil))
                 return
             }
-        } else {
-            // Fallback on earlier versions
         }
 
         let inputFolderUrl = URL(fileURLWithPath: path)//"/tmp/MyInputImages/"
-        let fileName = path+"/"+(arguments["name"] as! String)+".usdz"
-        let url = URL(fileURLWithPath: fileName)
+        let formatStr = (arguments["format"] as? String ?? "usdz").lowercased()
+        let nameStr = arguments["name"] as! String
+        let outputUrl: URL
+        let completedPathMarker: String
         
-        var quality:PhotogrammetrySession.Request.Detail = PhotogrammetrySession.Request.Detail.full
-        switch arguments["quality"] as! String{
-            case "reduced":
-                quality = PhotogrammetrySession.Request.Detail.reduced
-                break
-            case "medium":
-                quality = PhotogrammetrySession.Request.Detail.medium
-                break
-            case "preview":
-                quality = PhotogrammetrySession.Request.Detail.preview
-                break
-            case "raw":
-                quality = PhotogrammetrySession.Request.Detail.raw
-                break
-            default:
-                quality = PhotogrammetrySession.Request.Detail.full
-                break
+        if formatStr == "obj" {
+            // OBJ output requires a directory path instead of a file file path. 
+            // RealityKit will generate 'mesh.obj', 'mesh.mtl', and image files inside this directory.
+            let objDirectoryPath = path + "/" + nameStr + "_obj"
+            outputUrl = URL(fileURLWithPath: objDirectoryPath, isDirectory: true)
+            completedPathMarker = objDirectoryPath
+            
+            // Create directory if it doesn't exist yet
+            try? FileManager.default.createDirectory(at: outputUrl, withIntermediateDirectories: true, attributes: nil)
+        } else if formatStr == "usda" {
+            let fileAssetPath = path + "/" + nameStr + ".usda"
+            outputUrl = URL(fileURLWithPath: fileAssetPath)
+            completedPathMarker = fileAssetPath
+        } else {
+            // Defaulting back to native compressed USDZ binary format
+            let fileAssetPath = path + "/" + nameStr + ".usdz"
+            outputUrl = URL(fileURLWithPath: fileAssetPath)
+            completedPathMarker = fileAssetPath
         }
-        
-        let request = PhotogrammetrySession.Request.modelFile(url: url, detail: quality)
 
-        var featureSensitivity:PhotogrammetrySession.Configuration.FeatureSensitivity = PhotogrammetrySession.Configuration.FeatureSensitivity.normal
-        switch arguments["sensitivity"] as! String{
-            case "high":
-                featureSensitivity = PhotogrammetrySession.Configuration.FeatureSensitivity.high
-                break
-            default:
-                featureSensitivity = PhotogrammetrySession.Configuration.FeatureSensitivity.normal
-                break
+        // let fileName = path+"/"+(arguments["name"] as! String)+".usdz"
+        // let url = URL(fileURLWithPath: fileName)
+        
+        var quality: PhotogrammetrySession.Request.Detail = .full
+        switch arguments["quality"] as! String {
+          case "reduced": quality = .reduced
+          case "medium": quality = .medium
+          case "preview": quality = .preview
+          case "raw": quality = .raw
+          default: quality = .full
         }
-        var sampleOrdering:PhotogrammetrySession.Configuration.SampleOrdering = PhotogrammetrySession.Configuration.SampleOrdering.sequential
-        switch arguments["ordering"] as! String{
-            case "sequential":
-                sampleOrdering = PhotogrammetrySession.Configuration.SampleOrdering.sequential
-                break
-            default:
-            sampleOrdering = PhotogrammetrySession.Configuration.SampleOrdering.unordered
-                break
+        
+        let request = PhotogrammetrySession.Request.modelFile(url: outputUrl, detail: quality)
+
+        var featureSensitivity: PhotogrammetrySession.Configuration.FeatureSensitivity = .normal
+        switch arguments["sensitivity"] as! String {
+          case "high": featureSensitivity = .high
+          default: featureSensitivity = .normal
         }
+
+        var sampleOrdering: PhotogrammetrySession.Configuration.SampleOrdering = .sequential
+          switch arguments["ordering"] as! String {
+          case "sequential": sampleOrdering = .sequential
+          default: sampleOrdering = .unordered
+        }
+        
         let enableMask:Bool = arguments["enableMask"] as? Bool ?? true
         var config = PhotogrammetrySession.Configuration()
         // Use slower, more sensitive landmark detection.
@@ -173,7 +180,7 @@ public class PhotogrammetryPlugin: NSObject, FlutterPlugin, FlutterStreamHandler
                             break
                     case .requestComplete(_, _):
                             self.sink([
-                                "onProcessingCompleted": fileName
+                                "onProcessingCompleted": completedPathMarker
                             ])
                             // RealityKit has finished processing a request.
                             break
@@ -217,7 +224,11 @@ public class PhotogrammetryPlugin: NSObject, FlutterPlugin, FlutterStreamHandler
                             ])
                             // Processing was canceled.
                             break
-                        @unknown default:
+                    case .requestProgressInfo(_, _):
+                        break
+                    case .stitchingIncomplete:
+                        break
+                    @unknown default:
                             // Unrecognized output.
                             break
                     }

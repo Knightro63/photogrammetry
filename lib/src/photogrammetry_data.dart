@@ -34,6 +34,12 @@ enum PhotogrammetryQuality{
   reduced //<50k triangles
 }
 
+enum PhotogrammetryFormat{
+  obj,
+  usda,
+  usdz
+}
+
 /// The data need to create the 3D model.
 /// 
 /// [enableMask] A Boolean value that indicates whether the session uses object masks.
@@ -54,7 +60,8 @@ class PhotogrammetryData{
     this.sensitivity = FeatureSensitivity.normal,
     required this.path,
     this.name = 'MyObject',
-    this.ordering = SampleOrdering.unordered
+    this.ordering = SampleOrdering.unordered,
+    this.format = PhotogrammetryFormat.usdz
   });
 
   String path;
@@ -63,6 +70,7 @@ class PhotogrammetryData{
   FeatureSensitivity sensitivity;
   SampleOrdering ordering;
   bool enableMask;
+  PhotogrammetryFormat format;
 
   @override
   String toString(){
@@ -75,6 +83,7 @@ class PhotogrammetryData{
     'enableMask': enableMask,
     'ordering': ordering.name,
     'name': name,
-    'path': path
+    'path': path,
+    'format': format.name
   };
 }
