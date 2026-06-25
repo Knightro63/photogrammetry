@@ -38,6 +38,7 @@ class Photogrammetry {
     Function(int sample, String reason)? onInvalidSample,
     void Function()? onStartedProcessing,
     Function(String path)? onProcessingCompleted,
+    Function(List<CameraPoseData> cameraPoses)? onCameraPosesCalculated,
     Function(double progress)? onProgressChanged,
     Function()? onComplete,
     Function(String path,int,int,String)? onError
@@ -61,6 +62,19 @@ class Photogrammetry {
             break;
           case 'onStartedProcessing':
             onStartedProcessing?.call();
+            break;
+          case 'onCameraPosesCalculated':
+            final rawList = List<Map>.from(data[key] as List);
+            final processedPoses = rawList.map((item) {
+              final transformList = List<num>.from(item['transform'] as List)
+                  .map((n) => n.toDouble())
+                  .toList();
+              return CameraPoseData(
+                photoId: item['id']?.toString() ?? '',
+                transformMatrix: transformList,
+              );
+            }).toList();
+            onCameraPosesCalculated?.call(processedPoses);
             break;
           case 'onProcessingCompleted':
             onProcessingCompleted?.call(data[key] as String);

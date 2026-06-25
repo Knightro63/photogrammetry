@@ -87,3 +87,18 @@ class PhotogrammetryData{
     'format': format.name
   };
 }
+
+class CameraPoseData {
+  final String photoId; // Key name mapping to the source photo
+  final List<double> transformMatrix; // Flat array of 16 entries (4x4 matrix)
+
+  CameraPoseData({required this.photoId, required this.transformMatrix});
+
+  /// Helper getter to extract the raw X, Y, Z spatial translation coordinates 
+  /// directly from the final column of the 4x4 transformation matrix.
+  List<double> get translation3D => [
+    transformMatrix[12], // X-axis coordinate
+    transformMatrix[13], // Y-axis coordinate
+    transformMatrix[14], // Z-axis coordinate
+  ];
+}

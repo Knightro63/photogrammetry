@@ -1,3 +1,8 @@
+## 0.0.3
+
+* Added camera positions.
+* Fix crash if model already exists.
+
 ## 0.0.2
 
 * Added obj and usda outputs.

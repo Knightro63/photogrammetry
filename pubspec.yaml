@@ -1,6 +1,6 @@
 name: photogrammetry
 description: A program that takes a series of images and creates a 3D modle.
-version: 0.0.2
+version: 0.0.3
 homepage: https://github.com/Knightro63/photogrammetry/
 
 environment:
