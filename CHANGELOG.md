@@ -1,3 +1,7 @@
+## 0.0.4
+
+* Added a map export for the Camera positions data.
+
 ## 0.0.3
 
 * Added camera positions.

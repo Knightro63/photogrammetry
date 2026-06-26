@@ -88,6 +88,11 @@ class PhotogrammetryData{
   };
 }
 
+/// The data for the where the images were caputred in 3d space.
+/// 
+/// [photoId] A string of the photos name.
+/// 
+/// [transformMatrix]  The 4x4 matrix of the position, and rotation
 class CameraPoseData {
   final String photoId; // Key name mapping to the source photo
   final List<double> transformMatrix; // Flat array of 16 entries (4x4 matrix)
@@ -101,4 +106,9 @@ class CameraPoseData {
     transformMatrix[13], // Y-axis coordinate
     transformMatrix[14], // Z-axis coordinate
   ];
+
+  Map<String,dynamic> get map => {
+    'id': photoId,
+    'transform': transformMatrix,
+  };
 }

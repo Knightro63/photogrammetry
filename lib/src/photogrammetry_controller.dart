@@ -117,6 +117,7 @@ class Photogrammetry {
 
   /// Dispose of the stream event
   void dispose(){
+    _methodChannel.invokeMethod('abort');
     events?.cancel();
   }
 

@@ -32,7 +32,6 @@ public class PhotogrammetryPlugin: NSObject, FlutterPlugin, FlutterStreamHandler
     registrar.addMethodCallDelegate(instance, channel: method)
     event.setStreamHandler(instance)
     #endif
-    registrar.addMethodCallDelegate(instance, channel: method)
   }
   
   // FlutterStreamHandler
@@ -57,7 +56,11 @@ public class PhotogrammetryPlugin: NSObject, FlutterPlugin, FlutterStreamHandler
         }
         #if os(iOS)
           if #available(iOS 17.0, *) {
-            process(arguments,result)
+            guard PhotogrammetrySession.isSupported else {
+              result(FlutterError(code: "UNSUPPORTED_HARDWARE", message: "Device lacks Photogrammetry support.", details: nil))
+              return
+            }
+            process(arguments, result)
           } else {
             result(FlutterError(code: "INVALID OS", message: "requires version 17.0", details: nil))
             return
@@ -79,6 +82,12 @@ public class PhotogrammetryPlugin: NSObject, FlutterPlugin, FlutterStreamHandler
   @available(iOS 17.0, *)
   #endif
   func process(_ arguments: Dictionary<String, Any>, _ result: @escaping FlutterResult){
+    if let activeSession = self.session {
+      print("Stopping old background allocations before continuing...")
+      activeSession.cancel()
+      self.session = nil
+    }
+
     let path:String = arguments["path"] as! String
     if #available(macOS 13.0, *) {
       guard PhotogrammetrySession.isSupported else {
@@ -122,7 +131,10 @@ public class PhotogrammetryPlugin: NSObject, FlutterPlugin, FlutterStreamHandler
     // let fileName = path+"/"+(arguments["name"] as! String)+".usdz"
     // let url = URL(fileURLWithPath: fileName)
     
-    var quality: PhotogrammetrySession.Request.Detail = .full
+    var quality: PhotogrammetrySession.Request.Detail = .reduced
+    
+    #if os(macOS)
+    quality = .full
     switch arguments["quality"] as! String {
       case "reduced": quality = .reduced
       case "medium": quality = .medium
@@ -130,7 +142,8 @@ public class PhotogrammetryPlugin: NSObject, FlutterPlugin, FlutterStreamHandler
       case "raw": quality = .raw
       default: quality = .full
     }
-    
+    #endif
+      
     let modelRequest = PhotogrammetrySession.Request.modelFile(url: outputUrl, detail: quality)
     var posesRequest: PhotogrammetrySession.Request? = nil
     if #available(macOS 14.0, *) {
@@ -184,7 +197,12 @@ public class PhotogrammetryPlugin: NSObject, FlutterPlugin, FlutterStreamHandler
               return
             case .requestError(_, let error):
               self.sink([
-                  "onError": error
+                "onError": [
+                  "deviceAddress": "Photogrammetry",
+                  "error": 0,
+                  "errorType": 0,
+                  "message": error.localizedDescription
+                ]
               ])
               // Request encountered an error.
               break
