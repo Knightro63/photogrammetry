@@ -1,6 +1,8 @@
 ## 0.0.4
 
 * Added a map export for the Camera positions data.
+* Moved to SPM.
+* Added isSupported.
 
 ## 0.0.3
 

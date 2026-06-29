@@ -69,6 +69,21 @@ public class PhotogrammetryPlugin: NSObject, FlutterPlugin, FlutterStreamHandler
           process(arguments,result)
         #endif
         return
+    case "isSupported":
+      #if os(iOS)
+      if #available(iOS 17.0, *) {
+        result(PhotogrammetrySession.isSupported)
+      } else {
+        result(false) // API does not exist prior to iOS 17
+      }
+      #elseif os(macOS)
+      if #available(macOS 13.0, *) {
+        result(PhotogrammetrySession.isSupported)
+      } else {
+        result(false) // API does not exist prior to macOS 12
+      }
+      #endif
+      return
     case "abort":
       session?.cancel()
       return

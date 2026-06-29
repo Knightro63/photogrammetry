@@ -94,7 +94,6 @@ class Photogrammetry {
               result['errorType'] as int,
               result['message'] as String,
             );
-            events?.cancel();
             break;
         }
       }
@@ -112,6 +111,12 @@ class Photogrammetry {
   Future<String?> abort() async {
     String temp = await _methodChannel.invokeMethod('abort');
     events?.cancel();
+    return temp;
+  }
+
+  /// Check if Photogrammetry available for this device.
+  Future<bool> get isSupported async{
+    bool temp = (await _methodChannel.invokeMethod('isSupported')) ?? false;
     return temp;
   }
 
